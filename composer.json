@@ -1,0 +1,38 @@
+{
+    "name": "mybeast/sessions-laravel",
+    "description": "Laravel SDK for sessions.my-beast.com: signed tokens that let your pages be recorded, with the person's yes, and the journey of your signed-in people.",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.2",
+        "firebase/php-jwt": "^6.10 || ^7.0",
+        "illuminate/console": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/http": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/routing": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/support": "^11.0 || ^12.0 || ^13.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0 || ^10.0 || ^11.0",
+        "phpunit/phpunit": "^11.0 || ^12.0",
+        "justinrainbow/json-schema": "^6.0",
+        "laravel/pint": "^1.18"
+    },
+    "autoload": {
+        "psr-4": { "MyBeast\\Sessions\\Laravel\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "MyBeast\\Sessions\\Laravel\\Tests\\": "tests/" }
+    },
+    "extra": {
+        "laravel": {
+            "providers": ["MyBeast\\Sessions\\Laravel\\SessionsServiceProvider"],
+            "aliases": {}
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "config": { "sort-packages": true },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
