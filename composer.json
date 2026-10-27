@@ -1,6 +1,6 @@
 {
     "name": "mybeast/sessions-laravel",
-    "description": "Laravel SDK for sessions.my-beast.com: signed tokens that let your pages be recorded, with the person's yes, and the journey of your signed-in people.",
+    "description": "Laravel SDK for MyBeast Sessions (services.my-beast.com/sessions): signed tokens that let your pages be recorded, with the person's yes, and the journey of your signed-in people.",
     "type": "library",
     "license": "proprietary",
     "require": {

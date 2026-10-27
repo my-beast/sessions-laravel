@@ -1,6 +1,6 @@
 # mybeast/sessions-laravel
 
-The Laravel side of **sessions.my-beast.com**: it signs the short-lived client token a page carries, saying whose
+The Laravel side of **Sessions** (services.my-beast.com/sessions): it signs the short-lived client token a page carries, saying whose
 recording it would be (ids only) and whether this page may be recorded at all, and it keeps the **journey** of your
 signed-in people - one step per page shown or write taken - for the service's key flows and stuck points. PHP ≥ 8.2,
 Laravel 11-13.
@@ -15,7 +15,7 @@ composer require mybeast/sessions-laravel
 ```
 
 ```dotenv
-MYBEAST_SESSIONS_URL=https://sessions.my-beast.com
+MYBEAST_SESSIONS_URL=https://services.my-beast.com/sessions
 MYBEAST_SESSIONS_PUBLIC_KEY=pk_…
 MYBEAST_SESSIONS_SIGNING_KEY=sig_….…
 MYBEAST_SESSIONS_SECRET=sk_….…          # the journey, key flows, objections and erasure
@@ -84,7 +84,7 @@ those could not be opened, so they were not looked at. It throws `MyBeast\Sessio
 service does not hand them over whole - down, refused the secret, or past its caps (200 recordings, 32 MiB of events):
 then nothing is returned, never part of them. The service writes each export into its audit log.
 
-The token is the same format as errors.my-beast.com's (`schemas/v1/client-token.schema.json`), signed with this
+The token is the same format as Errors' (`schemas/v1/client-token.schema.json`), signed with this
 product's own key.
 
 ## The journey
@@ -252,4 +252,5 @@ For the service calls (`objected`, `syncFlows`, …) use `Http::fake()`.
 composer install && vendor/bin/phpunit
 ```
 
-`SchemaCopyTest` checks that `schemas/` is the service's, file for file, when the service sits beside this repo.
+`SchemaCopyTest` checks that `schemas/` is the Sessions module's (`services/schemas/sessions`), file for file, when
+services/ is two folders up.
