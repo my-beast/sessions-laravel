@@ -169,6 +169,8 @@ Steps wait in the spool and go to `POST /v1/steps` in gzip batches of up to 500,
 once the oldest has waited `flush_after` seconds, after each queued job, and every minute. The minute needs the
 scheduler (`php artisan schedule:work`, or cron running `schedule:run`) - the SDK puts `mybeast:sessions-flush` on it.
 Run `php artisan mybeast:sessions-flush` any time to send what waits; while the SDK is off it says so and succeeds.
+Past the project's monthly limit (its package's) the service refuses the rest of the month's steps as `monthly-limit`:
+they are dropped, and the log says so once a month, and once when the service takes steps again.
 
 A step the service refuses is dropped and logged (it will never be taken); a batch too big is halved; no answer or a
 5xx keeps the steps for later (at most 20,000 wait; past that new ones are dropped, logged once).

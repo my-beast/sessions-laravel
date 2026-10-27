@@ -105,15 +105,19 @@ final readonly class Flusher
 
     /**
      * A step the service refused never fits (its index and the reason are named): it is dropped with the batch, and
-     * said in the log with its route and kind - nothing of the person.
+     * said in the log with its route and kind - nothing of the person. Those refused because the project's month is
+     * used up are said once a month instead (monthLimit()).
      *
      * @param  list<array<string, mixed>>  $steps
      */
     private function refused(Response $response, array $steps): void
     {
-        $refused = $response->json('refused');
+        $all = $response->json('refused');
+        $all = is_array($all) ? $all : [];
+        $refused = array_values(array_filter($all, fn (mixed $item): bool => ! is_array($item) || ($item['reason'] ?? null) !== 'monthly-limit'));
+        $this->monthLimit(count($all) - count($refused), (int) $response->json('accepted'));
 
-        if (! is_array($refused) || $refused === []) {
+        if ($refused === []) {
             return;
         }
 
@@ -130,5 +134,24 @@ final readonly class Flusher
         }
 
         Log::warning('MyBeast sessions: the service refused '.count($refused).' journey step(s); they were dropped', ['refused' => $named]);
+    }
+
+    /**
+     * Past the project's monthly limit (its package's) the service refuses the rest of the month's steps as
+     * `monthly-limit`. They are dropped like any refused step - sent again they would be refused again until the 1st,
+     * UTC - but said once a month, and once when the service takes steps again, not on every flush. The spool keeps
+     * the month it was said for.
+     */
+    private function monthLimit(int $over, int $taken): void
+    {
+        $noted = $this->spool->note('monthly-limit');
+
+        if ($over > 0 && $noted !== gmdate('Y-m')) {
+            $this->spool->setNote('monthly-limit', gmdate('Y-m'));
+            Log::warning("MyBeast sessions: the project has used up this month's journey steps; the service drops the rest until the 1st (UTC).", ['dropped' => $over]);
+        } elseif ($over === 0 && $taken > 0 && $noted !== null) {
+            $this->spool->setNote('monthly-limit', null);
+            Log::info('MyBeast sessions: the service takes journey steps again.');
+        }
     }
 }

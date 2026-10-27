@@ -59,7 +59,7 @@ abstract class JourneyTestCase extends TestCase
 
     protected function tearDown(): void
     {
-        array_map('unlink', [...(glob($this->spool.'/*') ?: []), ...(glob($this->spool.'/.*.lock') ?: [])]);
+        array_map('unlink', [...(glob($this->spool.'/*') ?: []), ...(glob($this->spool.'/.*.lock') ?: []), ...array_filter([$this->spool.'/.monthly-limit'], 'is_file')]);
         @rmdir($this->spool);
 
         parent::tearDown();

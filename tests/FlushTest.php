@@ -70,6 +70,27 @@ final class FlushTest extends JourneyTestCase
             && $context['refused'] === [['index' => 1, 'reason' => 'subject: does not match', 'kind' => 'visit', 'route' => 'dashboard']])->once();
     }
 
+    public function test_past_the_months_limit_steps_are_dropped_and_said_once_a_month(): void
+    {
+        Log::spy();
+        $over = fn (int ...$indexes): array => ['accepted' => 0, 'dropped' => 0, 'refused' => array_map(fn (int $i): array => ['index' => $i, 'reason' => 'monthly-limit'], $indexes)];
+        Http::fakeSequence('sessions.example.test/*')->push($over(0, 1, 2), 202)->push($over(0, 1), 202)->push(self::TAKEN, 202);
+
+        $this->spoolSteps(3);
+        $this->assertSame(3, Sessions::flush());
+        $this->spoolSteps(2);
+        $this->assertSame(2, Sessions::flush());
+
+        // Dropped, not kept: the service would refuse them again until the 1st - and said once, not on every flush.
+        $this->assertSame([], $this->spooled());
+        Log::shouldHaveReceived('warning')->with("MyBeast sessions: the project has used up this month's journey steps; the service drops the rest until the 1st (UTC).", ['dropped' => 3])->once();
+        Log::shouldNotHaveReceived('warning', fn (string $message): bool => str_contains($message, 'journey step(s); they were dropped'));
+
+        $this->spoolSteps(1);
+        $this->assertSame(1, Sessions::flush());
+        Log::shouldHaveReceived('info')->with('MyBeast sessions: the service takes journey steps again.')->once();
+    }
+
     public function test_too_big_halves_the_batch_and_one_step_too_big_is_dropped(): void
     {
         $this->spoolSteps(4);
