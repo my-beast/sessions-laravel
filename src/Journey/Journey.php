@@ -91,6 +91,7 @@ final readonly class Journey
         ?array $fields = null,
         ?string $page = null,
         bool $dataRead = false,
+        ?string $requestId = null,
     ): ?JourneyStep {
         $recording = JourneyRequest::recordingId($request);
         $visit = JourneyRequest::visitKey($request, $recording);
@@ -123,7 +124,16 @@ final readonly class Journey
             fields: $fields,
             page: $page,
             dataRead: $dataRead,
+            request: $requestId,
         );
+    }
+
+    /** The header that carries a request's id (config `journey.request_id_header`; its log lines' id), or none. */
+    public function requestIdHeader(): ?string
+    {
+        $header = $this->settings->journeyValue('request_id_header', 'X-Request-Id');
+
+        return is_string($header) && $header !== '' ? $header : null;
     }
 
     public function record(JourneyStep $step): void

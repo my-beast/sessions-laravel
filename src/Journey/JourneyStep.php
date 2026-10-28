@@ -6,8 +6,8 @@ namespace MyBeast\Sessions\Laravel\Journey;
 
 /**
  * One step of a person's journey as the service takes it (schemas/v1/journey-steps.schema.json, one item of
- * `steps`): who, which visit, when, what kind - and of the request only its route's name, method, status, time and the
- * NAMES of refused fields. Never a value, a message or a URL.
+ * `steps`): who, which visit, when, what kind - and of the request only its id (as its log lines carry it), its route's
+ * name, method, status, time and the NAMES of refused fields. Never a value, a message or a URL.
  *
  * A route or page name the schema would refuse goes as null - not cut, which would make it another name: the service
  * refuses a step whose name does not fit, and a step without the name still counts.
@@ -19,6 +19,9 @@ final readonly class JourneyStep
 
     /** A page's name (an Inertia component, `Projects/Show`): no space - never a sentence. */
     private const PAGE = '/^[A-Za-z0-9._:\/-]{1,120}$/';
+
+    /** A request's id as the host's log lines carry it (X-Request-Id): a ULID, a UUID, a proxy's. */
+    private const REQUEST = '/^[A-Za-z0-9._:-]{1,64}$/';
 
     private const MAX_FIELDS = 20;
 
@@ -49,15 +52,21 @@ final readonly class JourneyStep
         public ?array $fields = null,
         public ?string $page = null,
         public bool $dataRead = false,
+        public ?string $request = null,
         ?string $id = null,
     ) {
         $this->id = $id ?? self::uuid();
     }
 
-    /** @return array<string, mixed> the schema's shape: a name that does not fit is null, refused keys capped */
+    /**
+     * The schema's shape: a name that does not fit is null, refused keys capped; the request's id only when there is
+     * one (a service from before 28.10.2026 refuses the field, so a step without it still goes everywhere).
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
-        return [
+        $step = [
             'id' => $this->id,
             'subject' => $this->subject,
             'account' => $this->account,
@@ -75,6 +84,18 @@ final readonly class JourneyStep
             'page' => self::pageName($this->page),
             'data_read' => $this->dataRead,
         ];
+
+        if (($request = self::requestId($this->request)) !== null) {
+            $step['request'] = $request;
+        }
+
+        return $step;
+    }
+
+    /** The request's id when it is one the service takes, else null. */
+    public static function requestId(?string $request): ?string
+    {
+        return $request !== null && preg_match(self::REQUEST, $request) === 1 ? $request : null;
     }
 
     /** @return list<string>|null at most 20 keys, each at most 80 characters, no repeats */

@@ -82,6 +82,8 @@ abstract class JourneyTestCase extends TestCase
             })->name('dashboard');
 
             $router->get('/properties', fn () => response('<!doctype html><title>Properties</title>'))->name('properties.index');
+            // An app whose log channel names each request on its answer (mybeast/logs-laravel's AssignRequestId).
+            $router->get('/reports', fn () => response('<!doctype html><title>Reports</title>', 200, ['X-Request-Id' => '01JBC4Q8W2V6X3Y9Z5A7B1C3D5']))->name('reports.index');
             $router->get('/properties/{property}/money', fn () => response('<!doctype html><title>Money</title>'))->name('properties.money');
             $router->get('/settings/security', fn () => response('<!doctype html><title>Security</title>'))->name('settings.security');
 

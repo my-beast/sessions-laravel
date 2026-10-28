@@ -28,9 +28,9 @@ use Throwable;
  * is the step); other JSON reads (polling, badges); broadcasting's sign-in; the SDK's own routes (mybeast.*), a
  * request that reported a page itself (Sessions::pageShown) and config `journey.skip_routes`.
  *
- * Of a request it keeps the route's name, the method, the status, the time it took and, for a refused write, the KEYS
- * of its errors - the session's error bag (an Inertia or a plain form) or a 422 JSON answer's `errors` - never a
- * message, never a value.
+ * Of a request it keeps its id as its log lines carry it (the answer's X-Request-Id), the route's name, the method, the
+ * status, the time it took and, for a refused write, the KEYS of its errors - the session's error bag (an Inertia or a
+ * plain form) or a 422 JSON answer's `errors` - never a message, never a value.
  */
 final class RecordJourneyStep
 {
@@ -133,7 +133,20 @@ final class RecordJourneyStep
             fields: $fields,
             page: $hooks->page($request, $response),
             dataRead: $asked === 'data',
+            requestId: $this->requestId($request, $response),
         );
+    }
+
+    /**
+     * The request's id as its log lines carry it: the answer's header (mybeast/logs-laravel puts it on every answer, as
+     * an app may), else the request's own (a proxy's) - config `journey.request_id_header`. One that does not fit, none.
+     */
+    private function requestId(Request $request, Response $response): ?string
+    {
+        $header = $this->journey->requestIdHeader();
+        $id = $header === null ? null : ($response->headers->get($header) ?? $request->headers->get($header));
+
+        return is_string($id) ? JourneyStep::requestId($id) : null;
     }
 
     /** Broadcasting's sign-in, the SDK's own routes, a page report, the host's skip list. */

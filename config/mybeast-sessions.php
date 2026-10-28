@@ -60,6 +60,11 @@ return [
         'error_toast' => 'error',
         'server_error_toasts' => [],
 
+        // The header that carries the request's id - its log lines' (mybeast/logs-laravel sets it on every answer;
+        // a proxy's on the request does too): each step names its request, so Sessions opens exactly its lines in
+        // Logs. null: none.
+        'request_id_header' => 'X-Request-Id',
+
         // Your key flows: a class implementing MyBeast\Sessions\Laravel\Flows\KeyFlows. A deploy step pushes them:
         // php artisan mybeast:sessions-flows
         'flows' => null,

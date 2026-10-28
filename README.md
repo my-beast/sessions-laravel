@@ -146,6 +146,7 @@ The rest is config (`mybeast-sessions.journey.*`):
 | `data_reads` | `[]` | JSON reads that ARE steps (a sheet's or a list's data a key flow counts): kept as visits with `data_read: true` |
 | `error_toast` | `'error'` | The flash key of the toast a write sent back shows: flashed by a write, it makes the step `refused` |
 | `server_error_toasts` | `[]` | How the toasts that stand for a server error begin (`['flash.serverError']`): those make it `error`. `journeyUsing(serverError:)` decides instead |
+| `request_id_header` | `'X-Request-Id'` | The header that carries the request's id - its log lines': the answer's (mybeast/logs-laravel sets it on every answer), else the request's own (a proxy's). Each step names its request, so the replay opens exactly its lines in Logs. `null`: none. Needs Sessions from 28.10.2026 |
 | `spool_path` | `storage/app/private/mybeast-sessions-spool` | Where steps wait (files, never the database); each server its own |
 | `flush_after` | `10` | Seconds the oldest step waits before a response sends the spool (0: every response) |
 

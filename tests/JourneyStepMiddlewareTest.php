@@ -54,6 +54,35 @@ final class JourneyStepMiddlewareTest extends JourneyTestCase
         $this->assertMatchesRegularExpression('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $step['id']);
     }
 
+    public function test_a_step_names_its_request_as_its_log_lines_do(): void
+    {
+        // The answer's id (the app's log channel put it there), else the request's own (a proxy's).
+        $this->actingAs($this->user)->get('/reports', ['Accept' => 'text/html'])->assertOk();
+        $this->actingAs($this->user)->get('/properties', ['Accept' => 'text/html', 'X-Request-Id' => 'lb-7f3a9c21'])->assertOk();
+        // One that is not an id, and none at all: the step goes without - a service from before it refuses the field.
+        $this->actingAs($this->user)->get('/properties', ['Accept' => 'text/html', 'X-Request-Id' => 'not an id'])->assertOk();
+        $this->actingAs($this->user)->get('/dashboard', ['Accept' => 'text/html'])->assertOk();
+
+        [$answered, $proxied, $odd, $none] = $this->spooled();
+        $this->assertSame('01JBC4Q8W2V6X3Y9Z5A7B1C3D5', $answered['request']);
+        $this->assertSame('lb-7f3a9c21', $proxied['request']);
+        $this->assertArrayNotHasKey('request', $odd);
+        $this->assertArrayNotHasKey('request', $none);
+    }
+
+    #[DefineEnvironment('withoutRequestIds')]
+    public function test_a_host_may_name_no_request_header(): void
+    {
+        $this->actingAs($this->user)->get('/reports', ['Accept' => 'text/html'])->assertOk();
+
+        $this->assertArrayNotHasKey('request', $this->soleStep());
+    }
+
+    protected function withoutRequestIds($app): void
+    {
+        $app['config']->set('mybeast-sessions.journey.request_id_header', null);
+    }
+
     public function test_a_full_page_load_is_a_step_and_the_session_names_its_visit(): void
     {
         $this->actingAs($this->user)->get('/dashboard', ['Accept' => 'text/html'])->assertOk();
