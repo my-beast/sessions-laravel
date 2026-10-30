@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 /*
  * MyBeast sessions: recordings of this app's pages and the journey of its signed-in people, sent to Sessions at
- * services.my-beast.com/sessions. Every key and URL comes from the project's page there (Overview → Connect a host shows the .env block).
+ * services.my-beast.com/sessions. Every key and URL comes from the project's page there (its setup guide shows the
+ * .env block: the Overview until Sessions first hears the app, then "Setup guide").
  *
  * Missing or malformed values switch the SDK off - it never throws at boot and never breaks a page.
  */
