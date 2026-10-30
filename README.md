@@ -3,7 +3,7 @@
 The Laravel side of **Sessions** (services.my-beast.com/sessions): it signs the short-lived client token a page carries, saying whose
 recording it would be (ids only) and whether this page may be recorded at all, and it keeps the **journey** of your
 signed-in people - one step per page shown or write taken - for the service's key flows and stuck points. PHP ≥ 8.2,
-Laravel 11-13.
+Laravel 12 and 13.
 
 The recorder itself is the browser SDK's (`@mybeast/sessions`); this side signs its tokens, sends the journey your
 server sees, pushes your key flows, and erases a person's recordings or journey when the host asks.
@@ -257,3 +257,9 @@ composer install && vendor/bin/phpunit
 
 `SchemaCopyTest` checks that `schemas/` is the Sessions module's (`services/schemas/sessions`), file for file, when
 services/ is two folders up.
+
+## Releasing
+
+Add the version to `CHANGELOG.md`, then tag it: `git tag v0.2.0 && git push --tags`. Packagist reads the tag through
+its GitHub hook; there is no version in `composer.json`. The Tests workflow runs on the tag as on every push: PHP 8.2
+to 8.4 against Laravel 12 and 13 (Laravel 11 has unfixed advisories, so Composer will not install it).

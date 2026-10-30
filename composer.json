@@ -2,17 +2,26 @@
     "name": "mybeast/sessions-laravel",
     "description": "Laravel SDK for MyBeast Sessions (services.my-beast.com/sessions): signed tokens that let your pages be recorded, with the person's yes, and the journey of your signed-in people.",
     "type": "library",
-    "license": "proprietary",
+    "license": "MIT",
+    "keywords": ["mybeast", "laravel", "session-replay", "session-recording", "journeys"],
+    "homepage": "https://my-beast.com",
+    "support": {
+        "issues": "https://github.com/my-beast/sessions-laravel/issues",
+        "source": "https://github.com/my-beast/sessions-laravel"
+    },
+    "authors": [
+        { "name": "MyBeast", "homepage": "https://my-beast.com" }
+    ],
     "require": {
         "php": "^8.2",
         "firebase/php-jwt": "^6.10 || ^7.0",
-        "illuminate/console": "^11.0 || ^12.0 || ^13.0",
-        "illuminate/http": "^11.0 || ^12.0 || ^13.0",
-        "illuminate/routing": "^11.0 || ^12.0 || ^13.0",
-        "illuminate/support": "^11.0 || ^12.0 || ^13.0"
+        "illuminate/console": "^12.0 || ^13.0",
+        "illuminate/http": "^12.0 || ^13.0",
+        "illuminate/routing": "^12.0 || ^13.0",
+        "illuminate/support": "^12.0 || ^13.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^9.0 || ^10.0 || ^11.0",
+        "orchestra/testbench": "^10.0 || ^11.0",
         "phpunit/phpunit": "^11.0 || ^12.0",
         "justinrainbow/json-schema": "^6.0",
         "laravel/pint": "^1.18"
