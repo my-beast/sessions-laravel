@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.1 - not released yet
+## 0.1.1 - 2026-11-01
 
 - A signed-in person's visit to a page without the `auth` middleware is their journey step. Nothing had loaded the
   user when the step was made, so the visit was taken for a guest's and not kept. The id now comes from the session,
