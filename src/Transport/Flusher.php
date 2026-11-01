@@ -72,7 +72,7 @@ final readonly class Flusher
         try {
             $response = $this->client->sendSteps($steps, $timeout);
         } catch (TransportFailed $e) {
-            Log::warning('MyBeast sessions: journey steps wait in the spool', ['reason' => $e->getMessage()]);
+            Log::warning('My Beast sessions: journey steps wait in the spool', ['reason' => $e->getMessage()]);
 
             return Delivery::Later;
         }
@@ -85,7 +85,7 @@ final readonly class Flusher
 
         if ($response->status() === 413) {
             if (count($steps) === 1) {
-                Log::warning('MyBeast sessions: a journey step too big for the service was dropped', ['route' => $steps[0]['route'] ?? null]);
+                Log::warning('My Beast sessions: a journey step too big for the service was dropped', ['route' => $steps[0]['route'] ?? null]);
             }
 
             return Delivery::TooBig;
@@ -93,12 +93,12 @@ final readonly class Flusher
 
         if ($response->status() === 422) {
             // "Not a batch": the body itself is wrong, so sending it again would be refused again.
-            Log::warning('MyBeast sessions: the service refused a batch of journey steps as no batch; it was dropped', ['steps' => count($steps), 'answer' => mb_substr($response->body(), 0, 300)]);
+            Log::warning('My Beast sessions: the service refused a batch of journey steps as no batch; it was dropped', ['steps' => count($steps), 'answer' => mb_substr($response->body(), 0, 300)]);
 
             return Delivery::Taken;
         }
 
-        Log::warning('MyBeast sessions: journey steps wait in the spool', ['status' => $response->status()]);
+        Log::warning('My Beast sessions: journey steps wait in the spool', ['status' => $response->status()]);
 
         return Delivery::Later;
     }
@@ -133,7 +133,7 @@ final readonly class Flusher
             ];
         }
 
-        Log::warning('MyBeast sessions: the service refused '.count($refused).' journey step(s); they were dropped', ['refused' => $named]);
+        Log::warning('My Beast sessions: the service refused '.count($refused).' journey step(s); they were dropped', ['refused' => $named]);
     }
 
     /**
@@ -148,10 +148,10 @@ final readonly class Flusher
 
         if ($over > 0 && $noted !== gmdate('Y-m')) {
             $this->spool->setNote('monthly-limit', gmdate('Y-m'));
-            Log::warning("MyBeast sessions: the project has used up this month's journey steps; the service drops the rest until the 1st (UTC).", ['dropped' => $over]);
+            Log::warning("My Beast sessions: the project has used up this month's journey steps; the service drops the rest until the 1st (UTC).", ['dropped' => $over]);
         } elseif ($over === 0 && $taken > 0 && $noted !== null) {
             $this->spool->setNote('monthly-limit', null);
-            Log::info('MyBeast sessions: the service takes journey steps again.');
+            Log::info('My Beast sessions: the service takes journey steps again.');
         }
     }
 }

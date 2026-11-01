@@ -188,7 +188,7 @@ final class Sessions
 
             return $app->make(Journey::class)->pageShown($app->make('request'), $route, $page);
         } catch (Throwable $e) {
-            LogOnce::warning('journey.page', 'MyBeast sessions: a page shown was not kept: '.$e->getMessage(), $e);
+            LogOnce::warning('journey.page', 'My Beast sessions: a page shown was not kept: '.$e->getMessage(), $e);
 
             return false;
         }

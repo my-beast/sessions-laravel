@@ -78,7 +78,7 @@ final class JourneyHooks
         $id = self::id($this->subject !== null ? ($this->subject)($request) : $this->user()?->getAuthIdentifier());
 
         if ($id !== null && preg_match(self::ID, $id) !== 1) {
-            LogOnce::warning('journey.subject', 'MyBeast sessions: a journey subject is not an id of 1-64 letters, digits and . _ : - so its steps are not kept (Sessions::journeyUsing(subject: …)).');
+            LogOnce::warning('journey.subject', 'My Beast sessions: a journey subject is not an id of 1-64 letters, digits and . _ : - so its steps are not kept (Sessions::journeyUsing(subject: …)).');
 
             return null;
         }
@@ -92,7 +92,7 @@ final class JourneyHooks
         $id = $this->account === null ? null : self::id(($this->account)($request));
 
         if ($id !== null && preg_match(self::ID, $id) !== 1) {
-            LogOnce::warning('journey.account', 'MyBeast sessions: a journey account is not an id of 1-64 letters, digits and . _ : - so steps go without it (Sessions::journeyUsing(account: …)).');
+            LogOnce::warning('journey.account', 'My Beast sessions: a journey account is not an id of 1-64 letters, digits and . _ : - so steps go without it (Sessions::journeyUsing(account: …)).');
 
             return null;
         }

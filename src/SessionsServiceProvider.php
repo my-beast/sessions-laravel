@@ -27,7 +27,7 @@ use MyBeast\Sessions\Laravel\Transport\ServiceClient;
 use Throwable;
 
 /**
- * Plugs MyBeast sessions in: the config, the Sessions manager, and the journey - its middleware at the end of the
+ * Plugs My Beast sessions in: the config, the Sessions manager, and the journey - its middleware at the end of the
  * `web` group (unless config `journey.middleware` is false), its spool sent after each response and job and every
  * minute while it is on. Recording itself happens in the browser.
  */

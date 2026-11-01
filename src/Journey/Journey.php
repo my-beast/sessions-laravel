@@ -101,11 +101,11 @@ final readonly class Journey
         }
 
         if ($route !== null && JourneyStep::routeName($route) === null) {
-            LogOnce::warning('journey.route', "MyBeast sessions: the route name \"{$route}\" is not 1-120 letters, digits and . _ : - so its steps go without it.");
+            LogOnce::warning('journey.route', "My Beast sessions: the route name \"{$route}\" is not 1-120 letters, digits and . _ : - so its steps go without it.");
         }
 
         if ($page !== null && JourneyStep::pageName($page) === null) {
-            LogOnce::warning('journey.page-name', 'MyBeast sessions: a page name is not 1-120 letters, digits and . _ : / - so steps go without it (Sessions::journeyUsing(page: …)).');
+            LogOnce::warning('journey.page-name', 'My Beast sessions: a page name is not 1-120 letters, digits and . _ : / - so steps go without it (Sessions::journeyUsing(page: …)).');
         }
 
         return new JourneyStep(

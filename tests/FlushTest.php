@@ -83,12 +83,12 @@ final class FlushTest extends JourneyTestCase
 
         // Dropped, not kept: the service would refuse them again until the 1st - and said once, not on every flush.
         $this->assertSame([], $this->spooled());
-        Log::shouldHaveReceived('warning')->with("MyBeast sessions: the project has used up this month's journey steps; the service drops the rest until the 1st (UTC).", ['dropped' => 3])->once();
+        Log::shouldHaveReceived('warning')->with("My Beast sessions: the project has used up this month's journey steps; the service drops the rest until the 1st (UTC).", ['dropped' => 3])->once();
         Log::shouldNotHaveReceived('warning', fn (string $message): bool => str_contains($message, 'journey step(s); they were dropped'));
 
         $this->spoolSteps(1);
         $this->assertSame(1, Sessions::flush());
-        Log::shouldHaveReceived('info')->with('MyBeast sessions: the service takes journey steps again.')->once();
+        Log::shouldHaveReceived('info')->with('My Beast sessions: the service takes journey steps again.')->once();
     }
 
     public function test_too_big_halves_the_batch_and_one_step_too_big_is_dropped(): void

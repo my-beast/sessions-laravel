@@ -20,7 +20,7 @@ final class FlushCommand extends Command
     public function handle(Flusher $flusher): int
     {
         if (! $flusher->sending()) {
-            $this->line('MyBeast sessions is off (no URL or server secret): nothing to send.');
+            $this->line('My Beast sessions is off (no URL or server secret): nothing to send.');
 
             return self::SUCCESS;
         }

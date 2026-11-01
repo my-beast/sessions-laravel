@@ -61,7 +61,7 @@ final class FlowsCommand extends Command
         }
 
         if ($count === null) {
-            $this->line('MyBeast sessions is off (no URL or server secret): '.count($definitions).' key flow(s) fit, nothing sent.');
+            $this->line('My Beast sessions is off (no URL or server secret): '.count($definitions).' key flow(s) fit, nothing sent.');
 
             return self::SUCCESS;
         }

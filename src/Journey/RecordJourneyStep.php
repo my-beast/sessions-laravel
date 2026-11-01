@@ -74,7 +74,7 @@ final class RecordJourneyStep
                 $this->journey->record($step);
             }
         } catch (Throwable $e) {
-            LogOnce::warning('journey.step', 'MyBeast sessions: a journey step was not kept: '.$e->getMessage(), $e);
+            LogOnce::warning('journey.step', 'My Beast sessions: a journey step was not kept: '.$e->getMessage(), $e);
         }
     }
 

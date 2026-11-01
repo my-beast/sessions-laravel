@@ -23,7 +23,7 @@ final class SpoolSink implements StepSink
             return;
         }
 
-        LogOnce::warning('journey.spool', 'MyBeast sessions: journey steps are dropped - the spool is full or not writable ('.$this->spool->directory().').');
+        LogOnce::warning('journey.spool', 'My Beast sessions: journey steps are dropped - the spool is full or not writable ('.$this->spool->directory().').');
     }
 
     public function pending(): bool

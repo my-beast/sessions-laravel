@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * MyBeast sessions: recordings of this app's pages and the journey of its signed-in people, sent to Sessions at
+ * My Beast sessions: recordings of this app's pages and the journey of its signed-in people, sent to Sessions at
  * services.my-beast.com/sessions. Every key and URL comes from the project's page there (its setup guide shows the
  * .env block: the Overview until Sessions first hears the app, then "Setup guide").
  *
