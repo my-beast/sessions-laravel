@@ -44,7 +44,7 @@ use MyBeast\Sessions\Laravel\Facades\Sessions;
 - **Nothing is recorded without the person's yes.** Pass the moment they said it; null records nothing. The service
   refuses a recording token without it.
 - **Masked by default.** `mask: false` only where the project allows unmasked recordings; the service refuses an
-  unmasked token for an environment the project requires masking in.
+  unmasked token for an environment the project requires masking in, and in production always.
 - `internal: true` keeps your own people out of customer counts; `test: true` marks a synthetic person (a test or
   canary account): only their recordings can ever be read back (`testRecordings()` below). A recording keeps the mark
   its first token gave it - a token that says otherwise starts a new recording.
