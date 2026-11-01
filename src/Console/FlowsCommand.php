@@ -23,7 +23,7 @@ final class FlowsCommand extends Command
     protected $signature = 'mybeast:sessions-flows
         {--check : Only check the definitions, send nothing}';
 
-    protected $description = 'Push the key flows defined in this app to sessions.my-beast.com';
+    protected $description = 'Push the key flows defined in this app to My Beast Sessions';
 
     public function handle(Sessions $sessions, Router $router): int
     {

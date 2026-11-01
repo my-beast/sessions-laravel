@@ -15,7 +15,7 @@ final class FlushCommand extends Command
 {
     protected $signature = 'mybeast:sessions-flush';
 
-    protected $description = 'Send the journey steps that wait in the spool to sessions.my-beast.com';
+    protected $description = 'Send the journey steps that wait in the spool to My Beast Sessions';
 
     public function handle(Flusher $flusher): int
     {
