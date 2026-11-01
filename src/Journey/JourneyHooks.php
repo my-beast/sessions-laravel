@@ -6,6 +6,7 @@ namespace MyBeast\Sessions\Laravel\Journey;
 
 use Closure;
 use DateTimeInterface;
+use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\JsonResponse;
@@ -18,8 +19,8 @@ use Symfony\Component\HttpFoundation\Response;
  * How the host tells the journey about its people (Sessions::journeyUsing). Every hook has a default that needs no
  * code: the signed-in user's id and `created_at`, no account, everyone allows it, no page name but Inertia's.
  *
- * The defaults never look anyone up: they read the user some part of the request already signed in (a guard that
- * has one), so a guest's request costs nothing.
+ * The defaults never look anyone up: they read the user some part of the request already loaded, or else the id a
+ * session guard keeps in the session, so a guest's request costs nothing.
  */
 final class JourneyHooks
 {
@@ -75,7 +76,7 @@ final class JourneyHooks
     /** The person, as an id the service takes; null for a guest, or for an id it would refuse (said once in the log). */
     public function subject(Request $request): ?string
     {
-        $id = self::id($this->subject !== null ? ($this->subject)($request) : $this->user()?->getAuthIdentifier());
+        $id = self::id($this->subject !== null ? ($this->subject)($request) : $this->signedIn());
 
         if ($id !== null && preg_match(self::ID, $id) !== 1) {
             LogOnce::warning('journey.subject', 'My Beast sessions: a journey subject is not an id of 1-64 letters, digits and . _ : - so its steps are not kept (Sessions::journeyUsing(subject: …)).');
@@ -100,7 +101,10 @@ final class JourneyHooks
         return $id;
     }
 
-    /** When the person's account was made, unix ms (a key flow for new accounts starts only for people that new). */
+    /**
+     * When the person's account was made, unix ms (a key flow for new accounts starts only for people that new). By
+     * default only a user something loaded tells it; the session's id alone does not.
+     */
     public function subjectSince(Request $request): ?int
     {
         if ($this->subjectSince !== null) {
@@ -151,12 +155,27 @@ final class JourneyHooks
         return is_string($component) && $component !== '' ? $component : null;
     }
 
-    /** The user some part of the request already signed in - never a lookup of one. */
+    /** The user some part of the request already loaded - never a lookup of one. */
     private function user(): ?Authenticatable
     {
         $guard = $this->app->make('auth')->guard();
 
         return $guard->hasUser() ? $guard->user() : null;
+    }
+
+    /**
+     * The signed-in person's id: a loaded user's, or else the one a session guard keeps in the session. On a page
+     * without the auth middleware nothing has loaded them yet, and the guard's own id() would (a query).
+     */
+    private function signedIn(): mixed
+    {
+        if (($user = $this->user()) !== null) {
+            return $user->getAuthIdentifier();
+        }
+
+        $guard = $this->app->make('auth')->guard();
+
+        return $guard instanceof SessionGuard ? $guard->getSession()->get($guard->getName()) : null;
     }
 
     private static function id(mixed $value): ?string

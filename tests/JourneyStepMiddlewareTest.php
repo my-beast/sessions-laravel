@@ -185,6 +185,16 @@ final class JourneyStepMiddlewareTest extends JourneyTestCase
         $this->assertControlVisitIsKept();
     }
 
+    public function test_a_signed_in_person_s_page_without_the_auth_middleware_is_their_step(): void
+    {
+        // Nothing has loaded the user, only the session knows them. There is no users table, so a lookup would fail.
+        $this->withSession([$this->app['auth']->guard()->getName() => 42])->get('/properties', ['Accept' => 'text/html'])->assertOk();
+
+        $step = $this->soleStep();
+        $this->assertSame(['visit', 'properties.index', '42'], [$step['kind'], $step['route'], $step['subject']]);
+        $this->assertNull($step['subject_since'], 'Only a loaded user tells when they joined.');
+    }
+
     public function test_prefetches_partial_reloads_version_checks_and_json_reads_are_no_steps(): void
     {
         $this->actingAs($this->user);

@@ -116,9 +116,10 @@ meets the group's middleware.
 
 ### Who the person is (the hooks)
 
-The defaults need no code: the subject is the signed-in user's id (read off the guard that already has them - never
-a lookup), no account, `subject_since` is the user's `created_at`, everyone allows it. Change any of them from a
-service provider's `boot()`:
+The defaults need no code: the subject is the signed-in user's id (off the guard that already has them, else from the
+session - never a lookup, so a page without the `auth` middleware is theirs too), no account, `subject_since` is the
+user's `created_at` (when something loaded them), everyone allows it. Change any of them from a service provider's
+`boot()`:
 
 ```php
 use Illuminate\Http\Request;
