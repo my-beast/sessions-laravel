@@ -19,9 +19,19 @@ MYBEAST_SESSIONS_URL=https://services.my-beast.com/sessions
 MYBEAST_SESSIONS_PUBLIC_KEY=pk_…
 MYBEAST_SESSIONS_SIGNING_KEY=sig_….…
 MYBEAST_SESSIONS_SECRET=sk_….…          # the journey, key flows, objections and erasure
-MYBEAST_SESSIONS_ENVIRONMENT=production
+MYBEAST_SESSIONS_ENVIRONMENT=production # one of the project's environments: development, staging, production
 MYBEAST_SESSIONS_JOURNEY=true           # off unless switched on
 ```
+
+**Where the values come from.** id makes the keys with the project, and Secrets keeps the URL and key lines, filled
+in, in each of the project's environments: Secrets → the environment → Download .env is the whole block, with the
+other products' lines. A key made by hand is on the project's **Settings → Keys**
+(`services.my-beast.com/<workspace>/<project>/settings/keys`): a server secret is shown once, when made; the signing
+key again with Show.
+
+**The environment** is where this copy of the app runs, so each copy sets its own and Secrets doesn't hold it. Left
+out, it is `APP_ENV`: `local` on a developer's machine, a name the project doesn't list, so those recordings show
+apart from its environments. Set `development` there.
 
 A missing or malformed line switches that part off: `clientConfig()` returns null and nothing is recorded; without
 the secret no journey is kept and the service is never asked. Tests and a checkout without the service:
@@ -36,8 +46,8 @@ use MyBeast\Sessions\Laravel\Facades\Sessions;
 
 'sessions' => fn () => $user ? Sessions::clientConfig(
     subject: $user->id,
-    account: $workspace?->id,
     consentAt: $user->recording_consent_at,   // null: this page is not recorded
+    // also account: (their team's or workspace's id), if your users have one
 ) : null,
 ```
 
@@ -48,6 +58,47 @@ use MyBeast\Sessions\Laravel\Facades\Sessions;
 - `internal: true` keeps your own people out of customer counts; `test: true` marks a synthetic person (a test or
   canary account): only their recordings can ever be read back (`testRecordings()` below). A recording keeps the mark
   its first token gave it - a token that says otherwise starts a new recording.
+
+In a Blade layout, hand it over as JSON before the page's script:
+
+```blade
+@use('MyBeast\Sessions\Laravel\Facades\Sessions')
+<script>window.myBeast = @json(['sessions' => auth()->check() ? Sessions::clientConfig(subject: auth()->id(), consentAt: auth()->user()->recording_consent_at) : null]);</script>
+@vite('resources/js/app.js')   {{-- there: init(window.myBeast.sessions) --}}
+```
+
+**List the page's origin.** A browser sends only from an origin the project lists, as the address bar shows it
+(`https://app.example.com`, and `http://localhost:8000` for your own machine): the project's Settings → Browser
+origins, in Sessions or in Errors - it is one list for the project. From any other origin the browser gets no answer,
+and the recorder stops after three chunks.
+
+**Asking for the yes is your app's.** Keep when the person said it, and null until they do, or again once they take it
+back:
+
+```php
+// a migration
+$table->timestamp('recording_consent_at')->nullable();   // and 'datetime' in the model's casts
+
+// their answer, from a form of yours
+Route::post('/recording-consent', function (Request $request) {
+    $request->user()->forceFill(['recording_consent_at' => $request->boolean('allow') ? now() : null])->save();
+
+    return back();
+})->middleware('auth');
+```
+
+**A page open longer than its token** (`MYBEAST_SESSIONS_TOKEN_TTL`, 30 minutes) asks `@mybeast/sessions`' `getToken`
+for a fresh one. This SDK adds no route for it; a route of yours in `routes/web.php` does, answering 204 when there is
+no token (signed out, or the SDK off). A plain-text answer is never a journey step:
+
+```php
+Route::get('/sessions/token', function (Request $request) {
+    $user = $request->user();
+    $config = $user ? Sessions::clientConfig(subject: $user->id, consentAt: $user->recording_consent_at) : null;
+
+    return $config === null ? response()->noContent() : response($config['token'])->header('Content-Type', 'text/plain');
+})->name('sessions.token');
+```
 
 ## Erasing a person's or an account's recordings
 
@@ -205,7 +256,9 @@ final class AppKeyFlows implements KeyFlows
 }
 ```
 
-Name it in config (`'flows' => App\Journey\AppKeyFlows::class`) and push them as a **deploy step**:
+Name it in the published config (`php artisan vendor:publish --tag=mybeast-sessions-config`), as `journey.flows` in
+`config/mybeast-sessions.php` (`'journey' => [ …, 'flows' => App\Journey\AppKeyFlows::class ]`), and push them as a
+**deploy step**:
 
 ```bash
 php artisan mybeast:sessions-flows          # or Sessions::syncFlows()
@@ -250,7 +303,12 @@ $journey->assertNotRecorded(fn (array $step) => $step['kind'] === 'refused');
 
 For the service calls (`objected`, `syncFlows`, …) use `Http::fake()`.
 
-## Tests
+## Working on this SDK
+
+For whoever changes the SDK, in its repository: the Composer download leaves `workbench/` and the tests out, and the
+schema check needs My Beast's own checkout beside it.
+
+### Tests
 
 ```bash
 composer install && vendor/bin/phpunit
@@ -259,7 +317,7 @@ composer install && vendor/bin/phpunit
 `SchemaCopyTest` checks that `schemas/` is the Sessions module's (`services/schemas/sessions`), file for file, when
 services/ is two folders up.
 
-## Releasing
+### Releasing
 
 Add the version to `CHANGELOG.md`, then tag it: `git tag v0.2.0 && git push --tags`. Packagist reads the tag through
 its GitHub hook; there is no version in `composer.json`. The Tests workflow runs on the tag as on every push: PHP 8.2
